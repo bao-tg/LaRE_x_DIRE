@@ -26,9 +26,9 @@ for string in "${strings[@]}"; do
   python feature_extractor_ensemble.py \
     --input_path /home/petterluo/data/aigc_data/GenImage/anns_newceph/${string}.txt \
     --output_path /home/petterluo/project/FakeImageDetection/outputs/${string} \
-    --t 280 \
-    --prompt '' \
-    --ensemble_size 8 \
+    --t 200 \
+    --prompt 'a photo' \
+    --ensemble_size 4 \
     --pretrained_model_name_or_path "/home/petterluo/pretrained_models/models--runwayml--stable-diffusion-v1-5/snapshots/39593d5650112b4cc580433f6b0435385882d819" \
     --img_size 256 256 \
     --use_prompt_template \

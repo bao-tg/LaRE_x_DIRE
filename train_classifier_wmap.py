@@ -61,13 +61,6 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 
-import torch
-import numpy as np
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.autograd import Variable
-from torch.nn.modules.loss import _WeightedLoss
-
 
 class LabelSmoothingLoss(nn.Module):
     def __init__(self, classes, smoothing=0.0, dim=-1, weight=None):
