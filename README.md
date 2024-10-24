@@ -1,9 +1,12 @@
 # LaRE
 Official code for LaRE2: Latent Reconstruction Error Based Method for Diffusion-Generated Image Detection. (CVPR 2024) [[paper](https://arxiv.org/pdf/2403.17465)]
 
+<p align = "center">
+<img src="./assets/overview.png" width="400" />
+</p>
 
-![image](./assets/overview.png)
-
+## Environment Setup
+For LaRE extraction, please refer to [DIFT](https://github.com/Tsingularity/dift). For model training, please refer to [LASTED](https://github.com/HighwayWu/LASTED)
 
 ## Dataset
 We use GenImage as our dataset for training and evaluation. Please refer to [this repo](https://github.com/GenImage-Dataset/GenImage) 
