@@ -1,5 +1,8 @@
 # LaRE
-Official code for LaRE2: Latent Reconstruction Error Based Method for Diffusion-Generated Image Detection. (CVPR 2024) [[paper](https://arxiv.org/pdf/2403.17465)]
+Official code for LaRE2: Latent Reconstruction Error Based Method for Diffusion-Generated Image Detection (CVPR 2024).
+In this [paper](https://arxiv.org/pdf/2403.17465), we firstly propose the reconstruction error in latent space for generated-image 
+detection. Compared with the existing method, we remarkably reduce the cost of feature extraction while preserving the essential information required for the
+detection of diffusion-generated images.
 
 <p align = "center">
 <img src="./assets/overview.png" width="400" />
