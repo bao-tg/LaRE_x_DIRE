@@ -1,5 +1,5 @@
 cd code && python train_classifier_wmap.py \
-  --model 'CLipClassifierWMapV5' \
+  --model 'CLipClassifierWMapV6' \
   --train_file 'annotation/train_sdv5.txt' \
   --num_class 2 \
   --val_ratio 0 \
