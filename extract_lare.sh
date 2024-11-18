@@ -23,7 +23,7 @@
 #strings=("train_wukong" "train_imagenet_wukong" "train_mj" "train_imagenet_mj" )
 strings=("val_mj" "val_imagenet_mj" "val_adm" "val_imagenet_adm" "val_biggan" "val_imagenet_biggan" "val_glide" "val_imagenet_glide" "val_sd1d4" "val_imagenet_sd1d4" "val_vqdm" "val_imagenet_vqdm" "val_wukong" "val_imagenet_wukong")
 for string in "${strings[@]}"; do
-  python feature_extractor_ensemble.py \
+  python extract_lare.py \
     --input_path /home/petterluo/data/aigc_data/GenImage/anns_newceph/${string}.txt \
     --output_path /home/petterluo/project/FakeImageDetection/outputs/${string} \
     --t 200 \
