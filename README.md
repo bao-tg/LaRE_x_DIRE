@@ -42,6 +42,11 @@ Once LaRE extracted, we need a `map_file`. It contains all the absolute paths of
 bash train_classifier_wmap.sh
 ```
 
+### stage3: Model test
+```bash
+bash test.sh
+```
+
 ## TODO
 - [x] Release code for feature extraction
 - [x] Release code for model training
