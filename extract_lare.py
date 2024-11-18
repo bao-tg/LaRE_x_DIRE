@@ -42,9 +42,9 @@ import json
 
 class GenImageProcessor:
     def __init__(self,
-                 file_idx_to_folder='/home/petterluo/project/DIFT/resources/idx_to_folder.txt',
-                 file_idx_to_clsname='/home/petterluo/project/DIFT/resources/idx_to_clsname.json',
-                 filename_to_folder='/home/petterluo/project/DIFT/resources/filename_to_folder.json'):
+                 file_idx_to_folder='./anns/idx_to_folder.txt',
+                 file_idx_to_clsname='./anns/idx_to_clsname.json',
+                 filename_to_folder='./anns/filename_to_folder.json'):
         label_map_idx_to_folder = {}
         label_map_folder_to_idx = {}
         with open(file_idx_to_folder) as f:
