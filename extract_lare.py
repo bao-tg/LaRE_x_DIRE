@@ -34,7 +34,6 @@ from diffusers.optimization import get_scheduler
 from diffusers.training_utils import EMAModel
 from diffusers.utils import check_min_version, deprecate, is_wandb_available
 from diffusers.utils.import_utils import is_xformers_available
-from dataset import TxTDataset
 import argparse
 import multiprocessing as mp
 import json
