@@ -99,7 +99,7 @@ class ImageDataset(Dataset):
     def __init__(self, data_root, train_file,
                  data_size=512, val_ratio=None, split_anchor=True,
                  args=None,
-                 map_file='/home/petterluo/project/FakeImageDetection/outputs/all_map_anns_final.txt',
+                 map_file='/home/ubuntu/21bao.tg/LaRExDIRE/outputs/all_map_anns_final.txt',
                  ):
         self.data_root = data_root
         self.data_size = data_size

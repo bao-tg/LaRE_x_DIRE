@@ -67,17 +67,17 @@ class GenImageProcessor:
         folder_or_index = filename.split('_')[0]
 
         try:
-            if len(folder_or_index) <= 3:  # is a index
+            if len(folder_or_index) <= 2020:  # is a index
                 index = str(int(folder_or_index))
                 clsname_full = self.label_map_idx_to_clsname[index]
-            elif folder_or_index == 'ILSVRC2012':  # is val image:
+            elif folder_or_index == 'imagenet_ai_0419_vqdm/val':  # is val image:
                 folder = self.filename_to_folder[filename]
                 clsname_full = self.label_map_folder_to_clsname[folder]
-            elif folder_or_index == 'GLIDE':
-                index = str(int(filename.split('_')[4]))
+            elif folder_or_index == 'imagenet_ai_0123_glide':
+                index = str(int(filename.split('_')[2121]))
                 clsname_full = self.label_map_idx_to_clsname[index]
-            elif folder_or_index == 'VQDM':
-                index = str(int(filename.split('_')[4]))
+            elif folder_or_index == 'imagenet_ai_0419_vqdm':
+                index = str(int(filename.split('_')[2121]))
                 clsname_full = self.label_map_idx_to_clsname[index]
             else:  # is a folder
                 # print(len(folder_or_index))
@@ -95,6 +95,8 @@ class GenImageProcessor:
 
 
 def main(args, input_infos, device):
+    device = "cpu"  # Ensure everything runs on the CPU
+
     unet = UNet2DConditionModel.from_pretrained(
         args.pretrained_model_name_or_path, subfolder="unet", revision=None,
     )
@@ -104,39 +106,24 @@ def main(args, input_infos, device):
     tokenizer = CLIPTokenizer.from_pretrained(
         args.pretrained_model_name_or_path, subfolder="tokenizer", revision=None,
     )
-    # text_encoder = CLIPVisionModel.from_pretrained(
-    #     args.clip_path,
-    # )
-    # clip_processor = AutoProcessor.from_pretrained(args.clip_path)
     print('Load VAE')
     vae = AutoencoderKL.from_pretrained(
         args.pretrained_model_name_or_path, subfolder="vae", revision=None
     )
 
-    if args.dtype == "fp16":
-        unet = unet.half()
-        text_encoder = text_encoder.half()
-        vae = vae.half()
-
     noise_scheduler = DDPMScheduler.from_pretrained(args.pretrained_model_name_or_path, subfolder="scheduler")
-    # type is epsilon
-    print(f'noise pred type: {noise_scheduler.config.prediction_type}')
-    vae.requires_grad_(False)
-    text_encoder.requires_grad_(False)
-    unet.requires_grad_(False)
+    print(f'Noise prediction type: {noise_scheduler.config.prediction_type}')
 
-    vae = vae.to(device)
-    text_encoder = text_encoder.to(device)
-    # clip_model = clip_model.to('cuda')
-    unet = unet.to(device)
+    # Move models to CPU
+    vae.requires_grad_(False).to(device).eval()
+    text_encoder.requires_grad_(False).to(device).eval()
+    unet.requires_grad_(False).to(device).eval()
 
-    unet.eval()
-    vae.eval()
-    text_encoder.eval()
     genimage_processor = GenImageProcessor()
     for info in tqdm(input_infos):
         image_path, label, filename, clsname = genimage_processor(info, use_full_name=args.use_full_clsname)
         save_path = opj(args.output_path, filename.split('.')[0] + '.pt')
+
         try:
             img = Image.open(image_path).convert('RGB')
         except PIL.UnidentifiedImageError:
@@ -148,13 +135,7 @@ def main(args, input_infos, device):
             img = img.resize(args.img_size)
         img_tensor = (transforms.PILToTensor()(img) / 255.0 - 0.5) * 2
         image_sd = img_tensor.unsqueeze(0).to(device)
-        # image_clip = image_clip.to(device)
 
-        if args.dtype == "fp16":
-            image_sd = image_sd.half()
-            image_clip = image_clip.half()
-        # print(image_sd.shape)
-        # print(image_clip.shape)
         latents = vae.encode(image_sd).latent_dist.sample()
         latents = latents * vae.config.scaling_factor
 
@@ -162,21 +143,14 @@ def main(args, input_infos, device):
         bsz = latents.shape[0]
 
         noise = torch.randn_like(latents)
-        timesteps = torch.randint(args.t, args.t + 1, (bsz,),
-                                  device=latents.device)  # 1000
-        timesteps = timesteps.long()
+        timesteps = torch.randint(args.t, args.t + 1, (bsz,), device=latents.device).long()
         noisy_latents = noise_scheduler.add_noise(latents, noise, timesteps)
 
-        if args.use_prompt_template:
-            prompt = args.prompt_template.replace('[CLS]', clsname)
-        else:
-            prompt = args.prompt
-        text_input = tokenizer(prompt, max_length=tokenizer.model_max_length, padding="max_length", truncation=True,
-                               return_tensors="pt"
-                               ).to(device)
+        prompt = args.prompt_template.replace('[CLS]', clsname) if args.use_prompt_template else args.prompt
+        text_input = tokenizer(prompt, max_length=tokenizer.model_max_length, padding="max_length",
+                               truncation=True, return_tensors="pt").to(device)
         encoder_hidden_states = text_encoder(text_input["input_ids"])[0]
         encoder_hidden_states = encoder_hidden_states.repeat((args.ensemble_size, 1, 1))
-        # print(encoder_hidden_states.shape)
 
         if noise_scheduler.config.prediction_type == "epsilon":
             target = noise
@@ -186,18 +160,10 @@ def main(args, input_infos, device):
             raise ValueError(f"Unknown prediction type {noise_scheduler.config.prediction_type}")
 
         model_pred = unet(noisy_latents, timesteps, encoder_hidden_states).sample
-        # loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
-        loss = F.mse_loss(model_pred.float(), target.float(), reduction="none")  # bs * 4 * 32 * 32
-        loss = torch.mean(loss, dim=0)  # 1 * 4 * 32 * 32
-        # print(loss.shape)
+        loss = F.mse_loss(model_pred.float(), target.float(), reduction="none")
+        loss = torch.mean(loss, dim=0)
         torch.save(loss.squeeze(0).cpu(), save_path)
 
-        # noise_save_path = opj(args.output_path, 'noisze_' + filename.split('.')[0] + '.pt')
-        # torch.save(target.squeeze(0).cpu(), noise_save_path)
-
-        # v_target = noise_scheduler.get_velocity(latents, noise, timesteps)
-        # noiseV_save_path = opj(args.output_path, 'noiszeV_' + filename.split('.')[0] + '.pt')
-        # torch.save(v_target.squeeze(0).cpu(), noiseV_save_path)
 
 
 def split_list(lst, n):
@@ -266,13 +232,12 @@ if __name__ == '__main__':
     with open(info_save_path, 'w') as f:
         f.writelines(out_infos)
 
-    num_gpus = torch.cuda.device_count()
-    assert num_gpus == args.n_gpus
+    num_gpus = 1  # Set to 1 since we are using CPU
     splited_infos = split_list(input_infos, num_gpus)
     # run
 
     # debug
-    # main(args, splited_infos[0], "cuda:0")
+    # main(args, splited_infos[0], "cpu")
     with mp.Pool(processes=num_gpus) as pool:
-        pool.starmap(main, [(args, splited_infos[i], f"cuda:{i}") for i in range(num_gpus)])
+        pool.starmap(main, [(args, splited_infos[i], "cpu") for i in range(num_gpus)])
     print("Done")

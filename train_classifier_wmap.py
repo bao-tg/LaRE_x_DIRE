@@ -92,7 +92,7 @@ class ImageDataset(Dataset):
     def __init__(self, data_root, train_file,
                  data_size=512, val_ratio=None, split_anchor=True,
                  args=None,
-                 map_file='/home/petterluo/project/FakeImageDetection/outputs/all_map_anns_final.txt',
+                 map_file='/home/ubuntu/21bao.tg/LaRExDIRE/outputs/all_map_anns_final.txt',
                  ):
         self.data_root = data_root
         self.data_size = data_size
@@ -485,14 +485,14 @@ def main(gpu, ngpus_per_node, args):
         ]
     elif args.test_file == 'robust':
         test_file_list = [
-            ('/home/petterluo/project/FakeImageDetection/outputs/robust_test/anns/midjourney_jpg1_ann.txt', 'Midjourney'),
-            ('/home/petterluo/project/FakeImageDetection/outputs/robust_test/anns/sdv4_jpg1_ann.txt', 'StableDiffusionV1.4'),
-            ('/home/petterluo/project/FakeImageDetection/outputs/robust_test/anns/sdv5_jpg1_ann.txt', 'StableDiffusionV1.5'),
-            ('/home/petterluo/project/FakeImageDetection/outputs/robust_test/anns/adm_jpg1_ann.txt', 'ADM'),
-            ('/home/petterluo/project/FakeImageDetection/outputs/robust_test/anns/glide_jpg1_ann.txt', 'GLIDE'),
-            ('/home/petterluo/project/FakeImageDetection/outputs/robust_test/anns/wukong_jpg1_ann.txt', 'WuKong'),
-            ('/home/petterluo/project/FakeImageDetection/outputs/robust_test/anns/vqdm_jpg1_ann.txt', 'VQDM'),
-            ('/home/petterluo/project/FakeImageDetection/outputs/robust_test/anns/biggan_jpg1_ann.txt', 'Biggan'),
+            ('/home/ubuntu/21bao.tg/LaRExDIRE/outputs/robust_test/anns/midjourney_jpg1_ann.txt', 'Midjourney'),
+            ('/home/ubuntu/21bao.tg/LaRExDIRE/outputs/robust_test/anns/sdv4_jpg1_ann.txt', 'StableDiffusionV1.4'),
+            ('/home/ubuntu/21bao.tg/LaRExDIRE/outputs/robust_test/anns/sdv5_jpg1_ann.txt', 'StableDiffusionV1.5'),
+            ('/home/ubuntu/21bao.tg/LaRExDIRE/outputs/robust_test/anns/adm_jpg1_ann.txt', 'ADM'),
+            ('/home/ubuntu/21bao.tg/LaRExDIRE/outputs/robust_test/anns/glide_jpg1_ann.txt', 'GLIDE'),
+            ('/home/ubuntu/21bao.tg/LaRExDIRE/outputs/robust_test/anns/wukong_jpg1_ann.txt', 'WuKong'),
+            ('/home/ubuntu/21bao.tg/LaRExDIRE/outputs/robust_test/anns/vqdm_jpg1_ann.txt', 'VQDM'),
+            ('/home/ubuntu/21bao.tg/LaRExDIRE/outputs/robust_test/anns/biggan_jpg1_ann.txt', 'Biggan'),
         ]
     else:
         test_file_list = [
